@@ -1,25 +1,27 @@
+mod process;
+mod state;
 mod todo;
 
-// 必须导入了这个 trait 下面才能进行调用
-use todo::structs::traits::create::Create;
+use process::process_input;
+use serde_json::Map;
+use serde_json::Value;
+use state::read_file;
+use std::env;
 use todo::todo_factory;
-use todo::ItemTypes;
 
 fn main() {
-    let todo_item = todo_factory("pending", "washing");
-    match todo_item.unwrap() {
-        ItemTypes::Pending(item) => {
-            println!(
-                "This is a pending item with title: {}",
-                item.super_struct.title
-            );
-            item.create(&item.super_struct.title);
-        }
-        ItemTypes::Done(item) => {
-            println!(
-                "This is a done item with title: {}",
-                item.super_struct.title
-            );
-        }
+    let args: Vec<String> = env::args().collect();
+    let command: &String = &args[1];
+    let title: &String = &args[2];
+
+    let state: Map<String, Value> = read_file("./state.json");
+
+    let status: String;
+    match &state.get(title) {
+        Some(result) => status = result.to_string().replace('\"', ""),
+        None => status = "pending".to_string(),
     }
+
+    let item = todo_factory(&status, title).expect(&status);
+    process_input(item, command.to_string(), &state);
 }
