@@ -6,7 +6,9 @@ use serde_json::value::Value;
 use serde_json::Map;
 
 pub fn read_file(file_name: &str) -> Map<String, Value> {
-    let mut file = File::open(file_name.to_string()).unwrap();
+    // 给予同一个 file 文件创建、写入、读取的权限
+    // 相关问题：https://stackoverflow.com/questions/47956653/is-it-possible-to-use-the-same-file-for-reading-and-writing
+    let mut file = File::open(file_name).unwrap();
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
     let json: Value = serde_json::from_str(&data).unwrap();
