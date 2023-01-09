@@ -9,8 +9,10 @@ use crate::todo::{
     ItemTypes,
 };
 
+// 处理 pending 状态
 fn process_pending(item: Pending, command: String, state: &Map<String, Value>) {
     let mut state = state.clone();
+    // 根据用户的输入来调用不同的方法
     match command.as_str() {
         "get" => item.get(&item.super_struct.title, &state),
         "create" => item.create(
@@ -24,6 +26,7 @@ fn process_pending(item: Pending, command: String, state: &Map<String, Value>) {
     }
 }
 
+// 处理 done 状态
 fn process_done(item: Done, command: String, state: &Map<String, Value>) {
     let mut state = state.clone();
 
@@ -35,6 +38,7 @@ fn process_done(item: Done, command: String, state: &Map<String, Value>) {
     }
 }
 
+// 处理用户的输入，根据输入来匹配枚举，然后执行不同的操作
 pub fn process_input(item: ItemTypes, command: String, state: &Map<String, Value>) {
     match item {
         ItemTypes::Pending(item) => process_pending(item, command, state),
